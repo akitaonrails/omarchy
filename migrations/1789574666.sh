@@ -8,6 +8,10 @@ for flags_file in ~/.config/chromium-flags.conf ~/.config/chrome-flags.conf \
   ~/.config/brave-flags.conf ~/.config/brave-origin-flags.conf \
   ~/.config/microsoft-edge-stable-flags.conf; do
   if [[ -f $flags_file ]] && ! grep -qx -- "--enable-wayland-ime" "$flags_file"; then
+    # A last line without a newline would swallow the flag into its own argument.
+    if [[ -s $flags_file && -n $(tail -c 1 "$flags_file") ]]; then
+      printf '\n' >>"$flags_file"
+    fi
     printf '%s\n' "--enable-wayland-ime" >>"$flags_file"
   fi
 done

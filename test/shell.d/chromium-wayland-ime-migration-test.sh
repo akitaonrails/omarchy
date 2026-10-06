@@ -28,3 +28,9 @@ run_migration
 [[ $(grep -cx -- "--enable-wayland-ime" "$home/.config/brave-flags.conf") == 1 ]] || fail "migration is idempotent"
 grep -qx -- "--ozone-platform=wayland" "$home/.config/brave-flags.conf" || fail "migration preserves existing flags"
 pass "migration is idempotent and preserves customized flags"
+
+printf -- '--ozone-platform=wayland' >"$home/.config/chrome-flags.conf"
+run_migration
+grep -qx -- "--ozone-platform=wayland" "$home/.config/chrome-flags.conf" || fail "migration keeps an unterminated last flag intact"
+grep -qx -- "--enable-wayland-ime" "$home/.config/chrome-flags.conf" || fail "migration adds the flag as its own argument after an unterminated line"
+pass "migration starts a new line when the flags file does not end with one"
